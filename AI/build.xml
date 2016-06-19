@@ -14,6 +14,11 @@
         <echo>${user.properties.file}</echo>
         <echo>${libs.jme3.dir}</echo>
     </target>
+    
+    <target name="-pre-init"> <!-- Reference the right properties to have the libs -->
+        <property file="../suite/nbproject/private/platform-private.properties"/>
+        <property file="../suite/nbproject/jme-project-libs.properties"/>
+    </target>
     <!--
 
     There exist several targets which are by default empty and which can be 

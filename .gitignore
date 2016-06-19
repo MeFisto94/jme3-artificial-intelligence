@@ -1,0 +1,5 @@
+build/
+AI/build/
+AI/dist/
+suite/
+.gradle/

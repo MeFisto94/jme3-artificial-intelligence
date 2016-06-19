@@ -1,0 +1,65 @@
+apply plugin: 'java';
+
+
+task suite << {
+    File folder = new File("suite/nbproject");
+    if (!folder.exists()) {
+        println "Creating the plugins suite...";
+        //folder.mkdirs();
+        exec {
+            commandLine 'git', 'clone', '--depth', '1', suite_repo_url, folder
+        }
+
+        if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+            exec {
+                workingDir new File(path_suite)
+                commandLine 'cmd', '/c', 'gradlew.bat', 'setupSuite'
+            }
+        } else {
+            exec {
+                workingDir new File(path_suite)
+                commandLine './gradlew', 'setupSuite'
+            }
+        }
+
+    }
+
+    println "Applying new suite path"
+    File f = new File("nbproject/suite.properties")
+    if (f.exists())
+        f.delete();
+    f.createNewFile();
+    f.write('suite.dir=${basedir}/suite\r\n');
+
+}
+
+task assemble(dependsOn: suite, overwrite: true) << {
+    println "Setting myself as module to be compiled..."
+    ant.propertyfile(file: "suite/nbproject/project.properties") {
+        entry(key: "project.com.jme3.ai", value: "../") // Set the current directory as directory for module
+        entry(key: "modules", value: '${project.com.jme3.ai}')
+    }
+
+    /*println "Manually fixing/adding Library Entries"
+    ant.propertyfile(file: "AI/nbproject/project.properties") {
+        entry(key: 'libs.jme3.dir', value:'/Users/MeFisto94/Documents/Coding/jme3-artificial-intelligence/suite/sdk/build/cluster/libs')
+
+        file("suite/nbproject/jme-project-libs.properties").withReader { reader ->
+            def userProps = new Properties()
+            userProps.load(reader)
+            for(String k: userProps.keySet()) {
+                if (k != "libs.jme3.dir")
+                    entry(key: k, value: userProps.getProperty(k))
+            }
+        }
+
+    }*/
+
+    ant.ant(dir: ".", antfile: "build.xml")
+
+    println "Building Netbeans Modules"
+    // ant.ant(dir: ".", antfile: "build.xml", target: "nbm") // Note: for some reason, the nbm target isn't really executed?
+    exec {
+        commandLine 'ant', 'nbm'
+    }
+}
