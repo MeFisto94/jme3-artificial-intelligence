@@ -47,8 +47,8 @@ task assemble(dependsOn: suite, overwrite: true) << {
 
     println "Manually fixing/adding Library Entries (jMonkey Version)"
 
-    ant.propertyfile(file: "AI/nbproject/project.properties") {
-        def jmeVersion = "";"
+    ant.propertyfile(file: "suite/nbproject/jme-project-libs.properties") {
+        def jmeVersion = "";
 
         if (System.getenv("TRAVIS").equals("true")) { // TODO: Replace with engine/version.gradle
             jmeVersion = "3.1.0-master-SNAPSHOT"
