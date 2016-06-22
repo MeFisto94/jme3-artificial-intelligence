@@ -13,20 +13,16 @@ cache:
 install:
   - ./gradlew assemble
 
-#deploy:
-#  provider: releases
-#  api_key:
-#    secure: IoGNk8dOmBIB/lXqgd7we7UjyFULww6y43F/Dwx2KZZ6NqC4tvDfBpqEyYhhLC0Ltgpm6vO/+0EepnqmBO5CkDYBECcwpIQX+ndgIOZQLMonXQ3glcjM5yoNtoUbFEn7xvI2ntAKbUkKmWnjNVquHF7t7jT8QfUPymUdV+f1eHapQFtcx2VuDoGF4/1fZuygS5pNPgkw7bduQo8foxlDdzSicNJ8smV0QBUZE/dVlbK1ycitZZrGkkRW/uKvsN/FX+lkl6ANb4y8AE2kcn0EarY6FH5NrQgGp5QNbGdQw1/4voFsR8Bji2UHUYuhjCuV14cgenfSQXrW4rVV/YMGaxxR/BbFB5XfZPCBfIsqfVAGH+Rkvy8/ZTBot+v9L1Pp99RZSCCtJoGPYBQagjzEOOAJplnqNHJ1D8bQo+1XElcuki/qxlO3XvXGQwTs2HMyqrnmlfdRjD5JClxx06Wke4y+KjLWtiQfjihCaQK68ixkCF4U8B2lg8nsuFNmUxUMfPCkKir4XfjuZ27y9ZNBnZQNTKOjW1cjU2GhvGyDWfK5xgfSMP/uKpAopSkWYOMaQVeUlFvMI2NtKdkb7lko6bRizEj/EWlUjhTP7TzvVGE76PJh+XeUkcNQmoFBRYOY2L+TYVs9LlKl+DQbcAHOeMYlxfq/zN7OIAh7T5AsgZk=
-    # Use travis setup releases --force (gem install travis) and then anyone with push access can create the token
+deploy:
+  provider: releases
+  api_key:
+      secure: crfKJeu+AlnuRsit0HmBuibDta7pnhJSmC7yhKhVtLfH3dRwoJ/TQds3YAbenw9TRPynk3Q81DRAvG+zwhEDpWaSma1pbcCOIiQwiuamtKvUW25nXBAusLa+6blsf9heN61tdJFCCe8eBUbQMG4nC/y9VIRme/Vqz4Gqf2JZFwOxYYSThdoYNBuWqGvkpOIGObXFUOfdWTQvyJcR5KWfEFwAjworpmtj9nvflHG8o0bk/NDz7S+5FZSA33in52pJAi3f+oSrIUzODFF7pEyxo4yO2JrnKI45ewsI37wSCy95p8PEZqXr4fFVACrHF17zXwpKDUrISWnN7K2HFk5Z1c+bkWITfXNZU1yUwEikJ8G1E9LBUZbPU/+WGoU0zICyIgTxLjMAseCaGc0po1AerXnxM+CZfUa0GMZMsI3JD3GMYxEAAiAR8BkVPdbFemNudcVwU8txNRYTZY3HU4FUdXfZjeQZVDKn6NahRvtFan6Wt1V1YxpDyVz4+vTjv9VvFJSUPNeTWuOGOiJ69NGzIS3MhbtSQGHttMWaTTcxD5G9N7lbWnDn85K7GsQTs0Rw+GR1oPwQ5sCDEiLVmoavttdPET5yPFsXslpSHYA+OmL0++bHUQPVVypW13tlkXF/SRDr2dljAsNKRmTgmRvGnp/OxkuMiP3GU76WnpE8JR8=
+      # Use travis setup releases --force (gem install travis) and then anyone with push access can create the token
   # file_glob: true
-#  file:
-#   - release/libs/jme3-ai.jar
-#   - release/libs/jme3-ai-javadoc.zip
-#   - release/com-jme3-ai.nbm
-#  skip_cleanup: true
-#  on:
-#    repo: jMonkeyEngine/sdk
-#    tags: true
-
-before_install:
-  - git fetch --unshallow -q
+  file:
+   - release/libs/jme3-ai.jar
+   - release/libs/jme3-ai-javadoc.zip
+   - release/com-jme3-ai.nbm
+  skip_cleanup: true
+  on:
+    repo: MeFisto94/jme3-artificial-intelligence
