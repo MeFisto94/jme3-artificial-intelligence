@@ -1,16 +1,17 @@
 apply plugin: 'java';
 
 task downloadSuite << {
-    File folder = new File("suite/nbproject");
+    def suite_folder = "suite" // Is not completely implemented yet.
+    File folder = file(suite_folder + "/nbproject");
     if (!folder.exists()) {
         println "Downloading the plugins suite...";
         exec {
-            commandLine 'git', 'clone', '--depth', '1', suite_repo_url, folder
+            commandLine 'git', 'clone', '--depth', '1', suite_repo_url, suite_folder
         }
     } else {
         println "Updating the plugins suite...";
         exec {
-            workingDir 'suite'
+            workingDir suite_folder
             commandLine 'git', 'pull'
         }
     }
@@ -25,7 +26,7 @@ task setupSuite(type: GradleBuild, dependsOn: downloadSuite) {
 
 task applySuitePath(dependsOn: setupSuite) << {
     println "Applying new suite path"
-    File f = new File("nbproject/suite.properties")
+    File f = file("nbproject/suite.properties")
     if (f.exists())
         f.delete();
 
