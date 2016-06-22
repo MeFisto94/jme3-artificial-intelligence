@@ -45,9 +45,19 @@ task assemble(dependsOn: suite, overwrite: true) << {
         entry(key: "modules", value: '${project.com.jme3.ai}')
     }
 
-    /*println "Manually fixing/adding Library Entries"
+    println "Manually fixing/adding Library Entries (jMonkey Version)"
+
     ant.propertyfile(file: "AI/nbproject/project.properties") {
-        entry(key: 'libs.jme3.dir', value:'/Users/MeFisto94/Documents/Coding/jme3-artificial-intelligence/suite/libs')
+        def jmeVersion = "";"
+
+        if (System.getenv("TRAVIS").equals("true")) { // TODO: Replace with engine/version.gradle
+            jmeVersion = "3.1.0-master-SNAPSHOT"
+        } else {
+            jmeVersion = "3.1.0-SNAPSHOT" // Local Builds don't contain the branch for some reason
+        }
+
+        entry(key: "jme3-version-string", value: jmeVersion)
+        /*entry(key: 'libs.jme3.dir', value:'/Users/MeFisto94/Documents/Coding/jme3-artificial-intelligence/suite/libs')
 
         file("suite/nbproject/jme-project-libs.properties").withReader { reader ->
             def userProps = new Properties()
@@ -56,9 +66,8 @@ task assemble(dependsOn: suite, overwrite: true) << {
                 if (k != "libs.jme3.dir")
                     entry(key: k, value: userProps.getProperty(k))
             }
-        }
-
-    }*/
+        }*/
+    }
 
     //ant.ant(dir: ".", antfile: "build.xml") // Already called by nbm
     println "Building Netbeans Modules"
