@@ -1,40 +1,44 @@
 apply plugin: 'java';
 
-
-task suite << {
+task downloadSuite << {
     File folder = new File("suite/nbproject");
     if (!folder.exists()) {
-        println "Creating the plugins suite...";
-        //folder.mkdirs();
+        println "Downloading the plugins suite...";
         exec {
             commandLine 'git', 'clone', '--depth', '1', suite_repo_url, folder
         }
-
-        if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
-            exec {
-                workingDir new File(path_suite)
-                commandLine 'cmd', '/c', 'gradlew.bat', 'setupSuite'
-            }
-        } else {
-            exec {
-                workingDir new File(path_suite)
-                commandLine './gradlew', 'setupSuite'
-            }
+    } else {
+        println "Updating the plugins suite...";
+        exec {
+            workingDir 'suite'
+            commandLine 'git', 'pull'
         }
-
     }
+}
 
+task setupSuite(type: GradleBuild, dependsOn: downloadSuite) {
+    println "Setting up the plugins suite....."
+
+    buildFile = 'suite/build.gradle'
+    tasks = ['setupSuite']
+}
+
+task applySuitePath(dependsOn: setupSuite) << {
     println "Applying new suite path"
     File f = new File("nbproject/suite.properties")
     if (f.exists())
         f.delete();
+
     f.createNewFile();
     f.write('suite.dir=${basedir}/suite\r\n');
+}
+
+task suite(dependsOn: applySuitePath) << {
 
 }
 
 task assemble(dependsOn: suite, overwrite: true) << {
-    println "Setting myself as module to be compiled..."
+    println "Setting myself as the module to be compiled..."
     ant.propertyfile(file: "suite/nbproject/project.properties") {
         entry(key: "project.com.jme3.ai", value: "../") // Set the current directory as directory for module
         entry(key: "modules", value: '${project.com.jme3.ai}')
@@ -42,7 +46,7 @@ task assemble(dependsOn: suite, overwrite: true) << {
 
     /*println "Manually fixing/adding Library Entries"
     ant.propertyfile(file: "AI/nbproject/project.properties") {
-        entry(key: 'libs.jme3.dir', value:'/Users/MeFisto94/Documents/Coding/jme3-artificial-intelligence/suite/sdk/build/cluster/libs')
+        entry(key: 'libs.jme3.dir', value:'/Users/MeFisto94/Documents/Coding/jme3-artificial-intelligence/suite/libs')
 
         file("suite/nbproject/jme-project-libs.properties").withReader { reader ->
             def userProps = new Properties()
@@ -55,8 +59,7 @@ task assemble(dependsOn: suite, overwrite: true) << {
 
     }*/
 
-    ant.ant(dir: ".", antfile: "build.xml")
-
+    //ant.ant(dir: ".", antfile: "build.xml") // Already called by nbm
     println "Building Netbeans Modules"
     // ant.ant(dir: ".", antfile: "build.xml", target: "nbm") // Note: for some reason, the nbm target isn't really executed?
     exec {
