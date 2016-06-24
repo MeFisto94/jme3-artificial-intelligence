@@ -1,4 +1,6 @@
 apply plugin: 'java';
+import org.apache.tools.ant.filters.*
+def jmePomVersion = "";
 
 task downloadSuite << {
     def suite_folder = "suite" // Is not completely implemented yet.
@@ -38,25 +40,56 @@ task suite(dependsOn: applySuitePath) << {
 
 }
 
-task assemble(dependsOn: suite, overwrite: true) << {
+task CreateVersionFile(dependsOn: suite) << {
+    // Since it's a bit problematic to call version.gradle from a different directory and project (it won't pick the right repo, it won't export the vars), we copy and patch it a bit
+
+copy {
+    from 'suite/engine'
+    into '.'
+    include 'version.gradle'
+    filter { line ->
+        line = line.replace("def grgit = Grgit.open(project.file('.'))", "def grgit = Grgit.open(project.file('suite/engine/'))")
+        line = line.replace("import java.text.SimpleDateFormat", "ext.jmeVersion = \"3.1.0\"\n" +
+        "ext.jmeMainVersion = \"3.1\"\n" +
+        "ext.jmeVersionTag = \"SNAPSHOT\"\n" +
+        "ext.jmeVersionTagID = \"0\"\n" +
+        "import java.text.SimpleDateFormat")
+    } // Properties and git repo
+
+    def f = file("task.tmp")
+    f.text = "task writeVersion(dependsOn: configureVersionInfo) << {\n" + // since I can't find a way to access those version files..
+        "\tdef f1 = file(\"version.txt\")\n"+
+        "\tf1.text = jmePomVersion\n"+
+        "}\n"
+
+    filter(ConcatFilter, append: f)
+    }
+
+    delete(file("task.tmp"))
+}
+
+task getEngineVersion(type: GradleBuild, dependsOn: CreateVersionFile) {
+    buildFile = "version.gradle"
+    tasks = ['writeVersion'] // Our injected task.
+
+    doLast {
+        def f = file("version.txt")
+        jmePomVersion = f.text
+        delete(f)
+        delete("version.gradle")
+    }
+}
+
+task assemble(dependsOn: [suite, getEngineVersion], overwrite: true) << {
     println "Setting myself as the module to be compiled..."
     ant.propertyfile(file: "suite/nbproject/project.properties") {
         entry(key: "project.com.jme3.ai", value: "../") // Set the current directory as directory for module
         entry(key: "modules", value: '${project.com.jme3.ai}')
     }
 
-    println "Manually fixing/adding Library Entries (jMonkey Version)"
-
+    println "Manually fixing/adding Library Entries (jMonkey Version):"
     ant.propertyfile(file: "suite/nbproject/jme-project-libs.properties") {
-        def jmeVersion = "";
-
-        if (System.getenv("TRAVIS").equals("true")) { // TODO: Replace with engine/version.gradle
-            jmeVersion = "3.1.0-master-SNAPSHOT"
-        } else {
-            jmeVersion = "3.1.0-SNAPSHOT" // Local Builds don't contain the branch for some reason
-        }
-
-        entry(key: "jme3-version-string", value: jmeVersion)
+        entry(key: "jme3-version-string", value: jmePomVersion)
         /*entry(key: 'libs.jme3.dir', value:'/Users/MeFisto94/Documents/Coding/jme3-artificial-intelligence/suite/libs')
 
         file("suite/nbproject/jme-project-libs.properties").withReader { reader ->
@@ -70,8 +103,8 @@ task assemble(dependsOn: suite, overwrite: true) << {
     }
 
     //ant.ant(dir: ".", antfile: "build.xml") // Already called by nbm
-    println "Building Netbeans Modules"
     // ant.ant(dir: ".", antfile: "build.xml", target: "nbm") // Note: for some reason, the nbm target isn't really executed?
+	println "Building Netbeans Modules"
     exec {
         commandLine 'ant', 'nbm'
     }
