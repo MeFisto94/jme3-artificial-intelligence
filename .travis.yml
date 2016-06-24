@@ -20,8 +20,9 @@ deploy:
       # Use travis setup releases --force (gem install travis) and then anyone with push access can create the token
   # file_glob: true
   file:
-   - release/libs/jme3-ai.jar
-   - release/libs/jme3-ai-javadoc.zip
+   - release/libs/jME3-ai.jar
+   - release/libs/jME3-ai-javadoc.zip
+   - release/libs/jME3-ai-sources.zip
    - release/com-jme3-ai.nbm
   skip_cleanup: true
   on:
