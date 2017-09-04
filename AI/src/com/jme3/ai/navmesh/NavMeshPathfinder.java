@@ -59,7 +59,7 @@ public class NavMeshPathfinder {
      * @return the new position in the nearest cell
      */
     public Vector3f warp(Vector3f newPos) {
-        Vector3f newPos2d = new Vector3f(newPos.x, 0, newPos.z);
+        Vector3f newPos2d = new Vector3f(newPos.x, newPos.y, newPos.z);
         currentCell = navMesh.findClosestCell(newPos2d);
         currentPos3d.set(navMesh.snapPointToCell(currentCell, newPos2d));
         currentPos3d.setY(newPos.getY());
@@ -75,7 +75,7 @@ public class NavMeshPathfinder {
      * @return the position in the cell
      */
     public Vector3f warpInside(Vector3f position) {
-        Vector3f newPos2d = new Vector3f(position.x, 0, position.z);
+        Vector3f newPos2d = new Vector3f(position.x, position.y, position.z);
         Cell cell = navMesh.findClosestCell(newPos2d);
         position.set(navMesh.snapPointToCell(cell, newPos2d));
         return position;
